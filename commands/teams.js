@@ -1,7 +1,16 @@
-var async = require("async");
+const Discord = require("discord.js");
 
-function createTeams(message, max, remove, callback){
+async function createTeams(message, max, remove, callback){
 
+    
+    let originChannel = message.member.voice.channel;
+
+    if(!originChannel && !remove && callback){
+        callback("novoice");
+        return;
+    }
+
+    console.log("Channel: " + originChannel.id);
 
     //Getting Roles
 
@@ -31,24 +40,6 @@ function createTeams(message, max, remove, callback){
     }
 
     console.log(roles);
-
-    let authorId = message.author.id;
-    let originChannel = null;
-
-    const channels = message.guild.channels.cache.filter(c => c.type === 'voice' && c.members.size > 0);
-
-    for (const [channelID, channel] of channels) {
-        for (const [memberID, member] of channel.members) {
-
-            if(memberID === authorId){
-                console.log("This channel!");
-                originChannel = channel;
-            }
-
-        }
-    }
-
-    console.log("Channel: " + originChannel.id);
 
     let members = originChannel.members;
 
@@ -91,28 +82,21 @@ function createTeams(message, max, remove, callback){
     let removeAllRolesArray = [];
     for (const [memberID, member] of members) {
         assignRandomRole(member);
-        removeAllRolesArray.push(removeAllRoles(member));
+        await removeAllRoles(member);
     }
-    Promise.all(removeAllRolesArray).then(()=>{
 
+    console.log("finished");
 
-        if(!remove){
-            for (const roleAssigment of memberAssignments){
-
-                roleAssigment.member.roles.add(roleAssigment.role);
-    
-            }
-
-            if(callback){
-                callback(roles);
-            }
-
+    if(!remove){
+        for (const roleAssigment of memberAssignments){
+            roleAssigment.member.roles.add(roleAssigment.role);
         }
 
-       
+        if(callback){
+            callback(roles);
+        }
 
-
-    })
+    }
 
 
 
@@ -149,16 +133,38 @@ module.exports = {
                 case "random":
                     createTeams(msg, args[2] ? args[2] : 4, false, function(roles){
 
-                        let teaminfo = "Neue Teams: \n";
+                        if(roles == "novoice"){
+                            msg.reply("Du musst dich zunächst in einen Voice-Channel begeben.");
+                        }else{
+                            for(let roleObject of roles){
 
-                        for(let roleObject of roles){
-
-                            let roleName = roleObject
-
+                                if (roleObject.counter > 0) {
+                                    const roleName = roleObject.role.name;
+                                    const color = roleObject.role.color;
+                                    const memerList = roleObject.members;
+    
+                                    let description = "";
+    
+                                    for (const member of memerList) {
+                                        description += (member.displayName + "\n");
+                                    }
+    
+                                    const embed = new Discord.MessageEmbed()
+                                    .setTitle(roleName)
+                                    .setDescription(description)
+                                    .setColor(color);
+            
+                                    msg.channel.send(["Liste:", embed]);
+    
+                                    
+                                }
+    
+                                
+    
+                            }
                         }
-
-
-                        msg.channel.send(teaminfo);
+                    
+                        
 
                     });
                     break;

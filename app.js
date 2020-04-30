@@ -1,12 +1,5 @@
 var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
 require("dotenv").config();
-var indexRouter = require("./routes/index");
-var apiRouter = require("./routes/api");
-var apiResponse = require("./helpers/apiResponse");
-var cors = require("cors");
 
 // Discord Bot Setup
 const Discord = require("discord.js");
@@ -20,6 +13,10 @@ Object.keys(botCommands).map(key => {
 
 const TOKEN = process.env.TOKEN;
 
+let botState = {
+	servers: {}
+};
+
 bot.login(TOKEN);
 
 bot.on('ready', () => {
@@ -27,20 +24,30 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
-  const args = msg.content.split(/ +/);
-  const command = args.shift().toLowerCase();
-  console.info(`Called command: ${command}`);
 
-  if (!bot.commands.has(command)) return;
+	const taggedUser = msg.mentions.users.first();
 
-  try {
-    bot.commands.get(command).execute(msg, args);
-  } catch (error) {
-    console.error(error);
-    msg.reply('Entschuldigen Sie, ich kann Ihrer Anweisung leider nicht folgen.');
-  }
+	if(taggedUser && taggedUser.bot && taggedUser.id === bot.user.id){
+		console.log("Bot was tagged!");
+		bot.commands.get("/marvinsaysomething").execute(msg, null, null);
+	}
+
+	const args = msg.content.toLowerCase().split(/ +/);
+	const command = args.shift().toLowerCase();
+	console.info(`Called command: ${command}`);
+
+	if (!bot.commands.has(command)) return;
+
+	try {
+		bot.commands.get(command).execute(msg, args, botState);
+	} catch (error) {
+		console.error(error);
+		msg.reply('Ich kann leider nicht verstehen, was du sagst.');
+		msg.delete();
+	}
 });
 
+/*
 bot.on('messageReactionAdd', async (reaction, user) => {
 	// When we receive a reaction we check if the reaction is partial or not
 	if (reaction.partial) {
@@ -58,53 +65,4 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 	// The reaction is now also fully available and the properties will be reflected accurately:
 	console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
 });
-
-
-
-// DB connection
-var MONGODB_URL = process.env.MONGODB_URL;
-var mongoose = require("mongoose");
-mongoose.connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
-	//don't show the log when it is test
-	if(process.env.NODE_ENV !== "test") {
-		console.log("Connected to %s", MONGODB_URL);
-		console.log("App is running ... \n");
-		console.log("Press CTRL + C to stop the process. \n");
-	}
-})
-	.catch(err => {
-		console.error("App starting error:", err.message);
-		process.exit(1);
-	});
-var db = mongoose.connection;
-
-var app = express();
-
-//don't show the log when it is test
-if(process.env.NODE_ENV !== "test") {
-	app.use(logger("dev"));
-}
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-
-//To allow cross-origin requests
-app.use(cors());
-
-//Route Prefixes
-app.use("/", indexRouter);
-app.use("/api/", apiRouter);
-
-// throw 404 if URL not found
-app.all("*", function(req, res) {
-	return apiResponse.notFoundResponse(res, "Page not found");
-});
-
-app.use((err, req, res) => {
-	if(err.name == "UnauthorizedError"){
-		return apiResponse.unauthorizedResponse(res, err.message);
-	}
-});
-
-module.exports = app;
+*/

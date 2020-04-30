@@ -3,9 +3,9 @@ const Discord = require("discord.js");
 const games = require("./games");
 
 module.exports = {
-    name: '/info',
-    description: 'Info!',
-    execute(msg, args) {
+    name: '/play',
+    description: 'Play!',
+    execute(msg, args, botState) {
         console.log(args);
 
         const user = msg.member.user;
@@ -21,34 +21,41 @@ module.exports = {
                 console.log(game);
 
     
-                const title = (game ? game.title : args[0]);
+                const title = (game ? game.title : args[0]) + "?";
                 const thumbnail = game ? game.thumb : "https://i.imgur.com/YaSVaiE.jpg";
                 const url = game ? game.link : "";
                 const color = game ? game.color : 0x00AE86;
-                const info = game ? game.info : "...";
     
     
                 const embed = new Discord.MessageEmbed()
                 .setColor(color)
                 .setTitle(title)
-                .setDescription(info)
+                .setAuthor(username, userImage)
+                .setDescription("Gib einen Daumen hoch, wenn du dabei bist.")
+                .setFooter("Abstimmung")
                 .setThumbnail(thumbnail)
-                .addField("Code:", args[0], true);
+                .setTimestamp()
 
                 if(url.length > 0){
                     embed.addField("Link:", url, true);
                 }
+                
+    
             
-                msg.channel.send(["Info:", embed]);
+                msg.channel.send(["Abstimmung:", embed]).then(messageReaction => {
+                    messageReaction.react("👎");
+                    messageReaction.react("👍");
+                });
             } else {
                 msg.channel.send("Dieses Spiel existiert nicht in der Datenbank. Benutzt den Befehl **/list**, um eine Liste aller Spiele zu sehen.");
             }
 
 
-            //msg.delete({ timeout: 10000 });
+            msg.delete();
         }else{
-            msg.delete({ timeout: 1000 });
+            msg.channel.send(username + " hat langeweile. Starte jetzt einen Spielevorschlag.");
         }
+    
+        
     },
   };
-  

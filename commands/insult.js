@@ -2,7 +2,18 @@ const insultList = [
     "Idtiot",
     "Arschloch",
     "Pissnelke",
-    "Wixkind"
+    "Wixxkind",
+    "Hurensohn",
+    "Schweineprister",
+    "dummes Kind",
+    "Sohn eines Esels, der eine Ente gefickt hat",
+    "Missgestalt",
+    "Missgeburt",
+    "Hundesohn",
+    "Noob",
+    "Witzfigur",
+    "Vogel",
+    "Knoten"
 ];
 
 function getRandomInsult(){
@@ -18,7 +29,7 @@ module.exports = {
             const taggedUser = msg.mentions.users.first();
             msg.channel.send(`${taggedUser.username}, du ${getRandomInsult()}!`);
         } else {
-            msg.reply('Please tag a valid user!');
+            msg.reply('Du musst jemanden taggen!');
         }
         
     },
