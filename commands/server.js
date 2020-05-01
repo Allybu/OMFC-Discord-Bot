@@ -3,8 +3,8 @@ const Discord = require("discord.js");
 const games = require("./games");
 
 module.exports = {
-    name: '/info',
-    description: 'Info!',
+    name: '/server',
+    description: 'Server!',
     execute(msg, args) {
         console.log(args);
 
@@ -12,7 +12,7 @@ module.exports = {
         const username = user.username;
         const userImage = "https://cdn.discordapp.com/avatars/" + user.id + "/" + user.avatar + ".png";
 
-        if(args.length > 0){
+        if(args.length == 2){
             //Game poll
 
             const game = games[args[0]];
@@ -21,7 +21,7 @@ module.exports = {
                 console.log(game);
 
     
-                const title = (game ? game.title : args[0]);
+                const title = (game ? game.title : args[0]) + " Server";
                 const thumbnail = game ? game.thumb : "https://i.imgur.com/YaSVaiE.jpg";
                 const url = game ? game.link : "";
                 const color = game ? game.color : 0x00AE86;
@@ -30,15 +30,12 @@ module.exports = {
     
                 const embed = new Discord.MessageEmbed()
                 .setColor(color)
+                .setAuthor(username, userImage)
                 .setTitle(title)
-                .setDescription(info)
                 .setThumbnail(thumbnail)
-                .setFooter("Info")
-                .addField("Code:", args[0], true);
+                .addField("IP:", args[1]);
 
-                if(url.length > 0){
-                    embed.addField("Link:", url, true);
-                }
+                
             
                 msg.channel.send(["Info:", embed]);
             } else {

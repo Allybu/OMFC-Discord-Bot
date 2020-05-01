@@ -17,9 +17,9 @@ module.exports = {
         .addField("/play KÜRZEL", "Startet ein Voting für das angegebene Spiel.")
         .addField("/team random", "Verteilt alle Spieler im derzeitigen Voice-Channel auf die 4 Teams.")
         .addField("/team random X", "Verteilt alle Spieler im derzeitigen Voice-Channel auf X Teams. (Maximal 4)")
-        .addField("/team clear", "Entfert die Team-Zuweisungen");
+        .addField("/team clear", "Entfert die Team-Zuweisungen")
+        .addField("/server KÜRZEL IP", "Erstellt eine Info-Karte über den Server.");
 
-    
         msg.channel.send(["Info:", embed]);
 
     },

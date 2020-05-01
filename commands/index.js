@@ -8,5 +8,6 @@ module.exports = {
   List: require('./list'),
   Help: require('./help'),
   Marvin: require('./marvin'),
+  Server: require('./server'),
   TurnamentInfo: require('./turnament/info'),
 };
