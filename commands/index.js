@@ -9,5 +9,7 @@ module.exports = {
   Help: require('./help'),
   Marvin: require('./marvin'),
   Server: require('./server'),
+  Raid: require('./raid'),
+  Roster: require('./roster'),
   TurnamentInfo: require('./turnament/info'),
 };

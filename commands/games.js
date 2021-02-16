@@ -123,6 +123,13 @@ module.exports = {
         thumb: "https://i.imgur.com/Jv2mpCW.jpg",
         link: "https://www.minecraft.net",
         info: "Klötzchenspaß für Zwischendurch",
-        color: "#a8a19b"
+        color: "#5fa036"
+    },
+    wow: {
+        title: "World of Warcraft",
+        thumb: "https://i.imgur.com/ycqGUMQ.jpg",
+        link: "https://worldofwarcraft.com/",
+        info: "Leveln, Mythics, Raiden, Mounts farmen",
+        color: "#4c5d6f"
     }
 }

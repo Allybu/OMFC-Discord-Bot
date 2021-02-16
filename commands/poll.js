@@ -2,6 +2,8 @@ const Discord = require("discord.js");
 
 const games = require("./games");
 
+let printUrls = false;
+
 module.exports = {
     name: '/play',
     description: 'Play!',
@@ -15,7 +17,12 @@ module.exports = {
         if(args.length > 0){
             //Game poll
 
-            const game = games[args[0]];
+            const game = games[args[0].toLowerCase()];
+            let message = 'Gib einen Daumen hoch, wenn du dabei bist.';
+            if (args.length > 1) {
+                args.shift();
+                message = args.join(' ');
+            }
 
             if (game) {
                 console.log(game);
@@ -25,23 +32,31 @@ module.exports = {
                 const thumbnail = game ? game.thumb : "https://i.imgur.com/YaSVaiE.jpg";
                 const url = game ? game.link : "";
                 const color = game ? game.color : 0x00AE86;
-    
-    
+
                 const embed = new Discord.MessageEmbed()
                 .setColor(color)
                 .setTitle(title)
                 .setAuthor(username, userImage)
-                .setDescription("Gib einen Daumen hoch, wenn du dabei bist.")
+                .setDescription(message)
                 .setFooter("Abstimmung")
                 .setThumbnail(thumbnail)
                 .setTimestamp()
+                
 
-                if(url.length > 0){
+                if(url.length > 0 && printUrls){
                     embed.addField("Link:", url, true);
                 }
                 
+                /*const printTime = '22:31';
+                if(printTime){
+                    let date = new Date();
+                    let [hours, minutes, seconds] = printTime.split(':');
+                    date.setHours(+hours);
+                    date.setMinutes(minutes);
+                    date.setSeconds(0);
+                    embed.setTimestamp(date);
+                }*/
     
-            
                 msg.channel.send(["Abstimmung:", embed]).then(messageReaction => {
                     messageReaction.react("👎");
                     messageReaction.react("👍");
@@ -50,12 +65,11 @@ module.exports = {
                 msg.channel.send("Dieses Spiel existiert nicht in der Datenbank. Benutzt den Befehl **/list**, um eine Liste aller Spiele zu sehen.");
             }
 
-
             msg.delete();
         }else{
-            msg.channel.send(username + " hat langeweile. Starte jetzt einen Spielevorschlag.");
+            msg.channel.send(`**${username}** hat langeweile. Starte jetzt einen Spielevorschlag.`);
+            msg.delete();
         }
-    
         
     },
   };

@@ -1,5 +1,7 @@
 const Discord = require("discord.js");
 
+const lanMode = false;
+
 async function createTeams(message, max, remove, callback){
 
     
@@ -123,64 +125,60 @@ module.exports = {
     execute(msg, args) {
         console.log(args);
 
-        if(args.length > 0){
+        if (lanMode) {
+            if(args.length > 0){
     
-            switch(args[0]){
-                case "clear":
-                case "remove":
-                    createTeams(msg, 0, true);
-                    break;
-                case "random":
-                    createTeams(msg, args[2] ? args[2] : 4, false, function(roles){
-
-                        if(roles == "novoice"){
-                            msg.reply("Du musst dich zunächst in einen Voice-Channel begeben.");
-                        }else{
-                            for(let roleObject of roles){
-
-                                if (roleObject.counter > 0) {
-                                    const roleName = roleObject.role.name;
-                                    const color = roleObject.role.color;
-                                    const memerList = roleObject.members;
+                switch(args[0]){
+                    case "clear":
+                    case "remove":
+                        createTeams(msg, 0, true);
+                        break;
+                    case "random":
+                        createTeams(msg, args[2] ? args[2] : 4, false, function(roles){
     
-                                    let description = "";
+                            if(roles == "novoice"){
+                                msg.reply("Du musst dich zunächst in einen Voice-Channel begeben.");
+                            }else{
+                                for(let roleObject of roles){
     
-                                    for (const member of memerList) {
-                                        description += (member.displayName + "\n");
-                                    }
-    
-                                    const embed = new Discord.MessageEmbed()
-                                    .setTitle(roleName)
-                                    .setDescription(description)
-                                    .setColor(color);
-            
-                                    msg.channel.send(["Liste:", embed]);
-    
-                                    
-                                }
-    
-                                
-    
-                            }
-                        }
-                    
-                        
-
-                    });
-                    break;
-            }
-
-        }else{
-
-            // Print generall info...
-
-            //Testig::
-
-
-
-
-            
-        }
+                                    if (roleObject.counter > 0) {
+                                        const roleName = roleObject.role.name;
+                                        const color = roleObject.role.color;
+                                        const memerList = roleObject.members;
         
+                                        let description = "";
+        
+                                        for (const member of memerList) {
+                                            description += (member.displayName + "\n");
+                                        }
+        
+                                        const embed = new Discord.MessageEmbed()
+                                        .setTitle(roleName)
+                                        .setDescription(description)
+                                        .setColor(color);
+                
+                                        msg.channel.send(["Liste:", embed]);
+        
+                                        
+                                    }
+        
+                                    
+        
+                                }
+                            }
+                        
+                            
+    
+                        });
+                        break;
+                }
+    
+            }else{
+    
+            }
+        } else {
+            msg.channel.send('Diese Funktion steht zur Zeit nicht zur verfügung. 😥');
+        }
+
     },
   };
