@@ -330,7 +330,7 @@ const sendInviteLog = async (options) => {
         });
         // Log Message
         const role = printRole(options.reaction.emoji.name);
-        let roleString = `${options.state ? 'die Abmeldung zurückgenommen.' : '**abgemeldet**.'}`;
+        let roleString = `${options.state ? '**abgemeldet**.' : 'die Abmeldung zurückgenommen.'}`;
         if (role) {
             roleString = `als ${printRole(options.reaction.emoji.name)} ${options.state ? 'angemeldet' : '**abgemeldet**'}.`
         }
@@ -339,7 +339,7 @@ const sendInviteLog = async (options) => {
 
 
         // Print roster:
-        const delimiter = '--------------------------';
+        const delimiter = '--------------------------------';
         let roster = '';
         const promises = [];
         options.originalMessage.reactions.cache.each(r => {
@@ -355,7 +355,7 @@ const sendInviteLog = async (options) => {
             if (role) {
                 r.users.cache.filter(u => !u.bot).each(u => {
                     const discordGuildMember = guild.members.cache.find(member => {
-                        return member.user.id === options.user.id;
+                        return member.user.id === u.id;
                     });
                     if (discordGuildMember.nickname) {
                         roster += `${role} ${discordGuildMember.nickname}\n`;

@@ -26,7 +26,6 @@ bot.on('ready', () => {
   console.info(`Logged in as ${bot.user.tag}!`);
   bot.user.setActivity('Diablo IV');
   //bot.user.setActivity('Wird gerade entwickelt.');
-
   listenForInviteReactions(bot);
 });
 
