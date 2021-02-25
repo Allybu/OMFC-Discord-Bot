@@ -1,7 +1,9 @@
 const Discord = require('discord.js');
 const roster = require('./roster').Roster;
 
-const guildId = '699595758239875152';
+const guildId = process.env.GUILD_ID;
+
+const env = process.env.ENV || 'dev';
 
 const setNewRoster = async (client) => {
     const channel = client.channels.cache.find((c) =>
@@ -319,14 +321,14 @@ const printRole = (roleName) => {
     if (roleName === 'roledd') {
         return '<:roledd:748831003954511872>';
     }
+    if (roleName === 'sum') {
+        return '<:WorldOfWarcraft:713094112026427522>';
+    }
     return '';
 };
 
-const inviteChannel = 'anmeldung';
-const invitelogs = 'invitelog';
-
-// const inviteChannel = 'setup';
-// const invitelogs = 'invitechannel';
+const inviteChannel = env === 'prod' ? 'anmeldung' : 'invitechannel';
+const invitelogs = env === 'prod' ? 'invitelog' : 'invitelogs';
 
 const setInvites = async (client, message) => {
     const channel = client.channels.cache.find((c) =>
@@ -385,10 +387,13 @@ const sendInviteLog = async (options) => {
                 })
             );
         });
+        const stats = [];
+        let count = 0;
         await Promise.all(promises);
         options.originalMessage.reactions.cache.each((r) => {
             const roleName = printRole(r.emoji.name);
             if (roleName) {
+                const stat = { emoji: roleName, count: 0 };
                 r.users.cache
                     .filter((u) => !u.bot)
                     .each((u) => {
@@ -399,14 +404,24 @@ const sendInviteLog = async (options) => {
                         );
                         if (guildMember.nickname) {
                             rosterString += `${roleName} ${guildMember.nickname}\n`;
+                            count += 1;
+                            stat.count += 1;
                         }
                     });
+                stats.push(stat);
             }
         });
+
+        let result = '';
         if (roster.length === 0) {
             rosterString = '*Keine Anmeldung*\n';
+        } else {
+            stats.forEach((s) => {
+                result += `${s.count} ${s.emoji} `;
+            });
+            result += `(${count})`;
         }
-        const newContent = `${firstLines}\n${delimiter}\n${rosterString}${delimiter}`;
+        const newContent = `${firstLines}\n${delimiter}\n${rosterString}${delimiter}\n${result}\n${delimiter}`;
         options.originalMessage.edit(newContent).catch((e) => {
             console.error('Cant edit message', e);
         });
@@ -455,8 +470,25 @@ const listenForInviteReactions = async (client) => {
     }
 };
 
+const backupOldInvites = async (client) => {
+    const channel = client.channels.cache.find((c) =>
+        c.name.includes(inviteChannel)
+    );
+    const logChannel = client.channels.cache.find((c) =>
+        c.name.includes(invitelogs)
+    );
+    if (channel && logChannel) {
+        await channel.messages.fetch();
+        channel.messages.each((msg) => {
+            console.log(msg);
+            // TODO: Extract date from second line and check if it is in the past. If so delete the msg.
+        });
+    }
+};
+
 module.exports = {
     setNewRoster,
     setInvites,
     listenForInviteReactions,
+    backupOldInvites,
 };

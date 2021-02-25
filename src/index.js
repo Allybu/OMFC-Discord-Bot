@@ -2,7 +2,11 @@ require('dotenv').config();
 const cron = require('node-cron');
 
 const Discord = require('discord.js');
-const { setNewRoster, listenForInviteReactions } = require('./jobs');
+const {
+    setNewRoster,
+    listenForInviteReactions,
+    backupOldInvites,
+} = require('./jobs');
 
 // Discord Bot Setup
 const bot = new Discord.Client({
@@ -122,6 +126,7 @@ cron.schedule(
     '0 0 5 * * *',
     () => {
         setNewRoster(bot);
+        backupOldInvites(bot);
     },
     {}
 );
