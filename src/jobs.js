@@ -470,7 +470,28 @@ const listenForInviteReactions = async (client) => {
     }
 };
 
+//
+// "Hey ${name}, dies ist eine Raid-Erinnerung, da du dich für  ${name_event} am  ${datum_event} um ${uhrzeit_event} angemeldest hast. Morgen geht es los!
+// Bitte melde dich ab, falls doch keine Zeit hast. Das hilft uns bei der Planung sehr. Ansonsten schaue bitte, dass du für den Raid vorbereitet bist. Für den Progress setzen wir Consumables wie Bufffood, Flasks, Waffenöle, Potions und Verstärkungsrunen vorraus! Idealerweise bist du 15 Minuten vorher online, damit wir rechtzeitig loslegen können! Wir freuen uns auf einen erfolgreichen Raid! :WorldOfWarcraft: "
+//
+// const inviteMessage = async (client) => {
+//     const channel = client.channels.cache.find((c) =>
+//         c.name.includes(inviteChannel)
+//     );
+//     const logChannel = client.channels.cache.find((c) =>
+//         c.name.includes(invitelogs)
+//     );
+//     if (channel && logChannel) {
+//         await channel.messages.fetch();
+//         channel.messages.each((msg) => {
+//             console.log(msg);
+//             // TODO: Extract date from second line and check if it is in the past. If so delete the msg.
+//         });
+//     }
+// };
+
 const backupOldInvites = async (client) => {
+    // TODO: TBC
     const channel = client.channels.cache.find((c) =>
         c.name.includes(inviteChannel)
     );
