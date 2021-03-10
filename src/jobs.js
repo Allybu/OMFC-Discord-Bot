@@ -347,6 +347,20 @@ const setInvites = async (client, message) => {
     }
 };
 
+const editInvites = async (client, id, message) => {
+    const channel = client.channels.cache.find((c) =>
+        c.name.includes(inviteChannel)
+    );
+
+    await channel.messages.fetch();
+
+    const msgToEdit = channel.messages.cache.find((msg) => {
+        return msg.id === id;
+    });
+
+    return msgToEdit.edit(message);
+};
+
 const sendInviteLog = async (options) => {
     const { content } = options.originalMessage;
     if (content.includes(':clock')) {
@@ -512,4 +526,5 @@ module.exports = {
     setInvites,
     listenForInviteReactions,
     backupOldInvites,
+    editInvites,
 };
