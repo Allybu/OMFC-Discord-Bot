@@ -1,0 +1,57 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure SSH
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_KEY" > ~/.ssh/deploy.key
+        chmod 600 ~/.ssh/deploy.key
+        cat >>~/.ssh/config <<END
+        Host deploy
+          HostName $SSH_HOST
+          User $SSH_USER
+          IdentityFile ~/.ssh/deploy.key
+          StrictHostKeyChecking no
+        END
+      env:
+        SSH_USER: ${{ secrets.C_SSH_USER }}
+        SSH_KEY: ${{ secrets.C_SSH_KEY }}
+        SSH_HOST: ${{ secrets.C_SSH_HOST }}
+
+    - uses: actions/checkout@v2
+
+    - name: Prepare deployment package
+      run: |
+        mkdir ../dist
+        cp -TR . ../dist
+        tar -cvf deploy.tar ../dist/
+
+    - run: scp deploy.tar deploy:/home/alex/nodeapps/OMFC-Discord-Bot
+
+    - run: |
+        ssh deploy << EOF
+          cd /home/alex/nodeapps/OMFC-Discord-Bot
+          forever stop dist/src/index.js
+          rm -rf dist
+          tar xf deploy.tar
+          cd dist
+          npm ci
+          export BNET_ID=${{ secrets.BNET_ID }}
+          export BNET_SECRET=${{ secrets.BNET_SECRET }}
+          export DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+          export ENV=${{ secrets.ENV }}
+          export GUILD_ID=${{ secrets.GUILD_ID }}
+          export WL_PASSWORD=${{ secrets.WL_PASSWORD }}
+          export WL_USERNAME=${{ secrets.WL_USERNAME }}
+          forever start src/index.js
+        EOF
+
