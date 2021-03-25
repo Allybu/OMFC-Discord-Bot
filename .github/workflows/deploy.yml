@@ -40,6 +40,18 @@ jobs:
     - run: |
         ssh deploy << EOF
           cd /home/alex/nodeapps/OMFC-Discord-Bot
-          touch ok
+          forever stop dist/src/index.js
+          rm -rf dist
+          tar xf deploy.tar
+          cd dist
+          npm ci
+          export BNET_ID=${{ secrets.BNET_ID }}
+          export BNET_SECRET=${{ secrets.BNET_SECRET }}
+          export DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+          export ENV=${{ secrets.ENV }}
+          export GUILD_ID=${{ secrets.GUILD_ID }}
+          export WL_PASSWORD=${{ secrets.WL_PASSWORD }}
+          export WL_USERNAME=${{ secrets.WL_USERNAME }}
+          forever start src/index.js
         EOF
 

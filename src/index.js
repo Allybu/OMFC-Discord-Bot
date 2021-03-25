@@ -35,7 +35,7 @@ bot.on('ready', () => {
     if (env === 'dev') {
         bot.user.setActivity('Under construction...');
     } else if (env === 'prod') {
-        bot.user.setActivity('Diablo IV');
+        bot.user.setActivity('Diablo V');
     }
     listenForInviteReactions(bot);
 });
