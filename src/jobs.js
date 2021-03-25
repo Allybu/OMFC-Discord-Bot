@@ -330,6 +330,8 @@ const printRole = (roleName) => {
 const inviteChannel = env === 'prod' ? 'anmeldung' : 'invitechannel';
 const invitelogs = env === 'prod' ? 'invitelog' : 'invitelogs';
 
+const inviteDungeonChannel = env === 'prod' ? 'mythicplus' : 'testplus';
+
 const setInvites = async (client, message) => {
     const channel = client.channels.cache.find((c) =>
         c.name.includes(inviteChannel)
@@ -484,6 +486,45 @@ const listenForInviteReactions = async (client) => {
     }
 };
 
+const setDungeonInvites = async (client, message) => {
+    const channel = client.channels.cache.find((c) =>
+        c.name.includes(inviteDungeonChannel)
+    );
+    if (channel) {
+        channel
+            .send(message)
+            .then((msg) => {
+                msg.react('748830972086059088');
+                msg.react('748831003954511872');
+                msg.react('748830899541639188');
+            })
+            .catch((err) => console.error(err));
+    }
+};
+
+const deleteDungeonInvites = async (client, title, username) => {
+    const channel = client.channels.cache.find((c) =>
+        c.name.includes(inviteDungeonChannel)
+    );
+
+    await channel.messages.fetch();
+
+    const msgToDelete = channel.messages.cache.find((msg) => {
+        const { embeds } = msg;
+        if (embeds.length > 0) {
+            const embed = embeds[0];
+            const embedTitle = embed.title;
+            const embedUsername = embed.author.name;
+            return title === embedTitle && username === embedUsername;
+        }
+        return false;
+    });
+    if (msgToDelete) {
+        return msgToDelete.delete();
+    }
+    return null;
+};
+
 //
 // "Hey ${name}, dies ist eine Raid-Erinnerung, da du dich für  ${name_event} am  ${datum_event} um ${uhrzeit_event} angemeldest hast. Morgen geht es los!
 // Bitte melde dich ab, falls doch keine Zeit hast. Das hilft uns bei der Planung sehr. Ansonsten schaue bitte, dass du für den Raid vorbereitet bist. Für den Progress setzen wir Consumables wie Bufffood, Flasks, Waffenöle, Potions und Verstärkungsrunen vorraus! Idealerweise bist du 15 Minuten vorher online, damit wir rechtzeitig loslegen können! Wir freuen uns auf einen erfolgreichen Raid! :WorldOfWarcraft: "
@@ -527,4 +568,6 @@ module.exports = {
     listenForInviteReactions,
     backupOldInvites,
     editInvites,
+    setDungeonInvites,
+    deleteDungeonInvites,
 };

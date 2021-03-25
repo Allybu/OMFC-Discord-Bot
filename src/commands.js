@@ -12,4 +12,5 @@ module.exports = {
     Raid: require('./commands/raid'),
     Roster: require('./commands/roster'),
     Ask: require('./commands/ask'),
+    Mythic: require('./commands/mythic'),
 };
