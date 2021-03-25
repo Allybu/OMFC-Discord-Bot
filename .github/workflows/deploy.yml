@@ -31,8 +31,15 @@ jobs:
 
     - name: Prepare deployment package
       run: |
-        mkdir ../build
-        cp -TR . ../build
-        tar -cvf deploy.tar ../build/
+        mkdir ../dist
+        cp -TR . ../dist
+        tar -cvf deploy.tar ../dist/
 
     - run: scp deploy.tar deploy:/home/alex/nodeapps/OMFC-Discord-Bot
+
+    - run: |
+        ssh deploy << EOF
+          cd /home/alex/nodeapps/OMFC-Discord-Bot
+          touch ok
+        EOF
+
