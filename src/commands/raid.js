@@ -6,6 +6,7 @@ moment.locale('de');
 module.exports = {
     name: '/raid',
     description: 'Add raid date for invite channel.',
+    showInHelp: false,
     execute(msg, args) {
         // /raid 22.02.2021 19:00 Castle Nathria HC
 

@@ -113,9 +113,19 @@ async function createTeams(message, max, remove, callback) {
     // Getting Members of channel
 }
 
+// /team random
+// Verteilt alle Spieler im derzeitigen Voice-Channel auf die 4 Teams.
+
+// /team random X
+// Verteilt alle Spieler im derzeitigen Voice-Channel auf X Teams. (Maximal 4)
+
+// /team clear
+// Entfert die Team-Zuweisungen
+
 module.exports = {
     name: '/team',
-    description: 'Team!',
+    description: 'Mit diesem Befehl kann man den Spielern im aktuallen Voice chat in random-teams einteilen. /team random (X)',
+    showInHelp: true,
     execute(msg, args) {
         console.log(args);
 
@@ -173,5 +183,7 @@ module.exports = {
                 'Diese Funktion steht zur Zeit nicht zur verfügung. 😥'
             );
         }
+
+        msg.delete();
     },
 };

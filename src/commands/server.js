@@ -4,7 +4,8 @@ const games = require('./games');
 
 module.exports = {
     name: '/server',
-    description: 'Server!',
+    description: 'Erstellt eine Info-Karte über den Server. /server KÜRZEL IP',
+    showInHelp: true,
     execute(msg, args) {
         console.log(args);
 

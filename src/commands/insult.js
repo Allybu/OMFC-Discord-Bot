@@ -23,6 +23,7 @@ function getRandomInsult() {
 module.exports = {
     name: '/insult',
     description: 'Insult!',
+    showInHelp: false,
     execute(msg) {
         if (msg.mentions.users.size) {
             const taggedUser = msg.mentions.users.first();

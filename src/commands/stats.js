@@ -4,6 +4,7 @@ const axios = require('axios');
 module.exports = {
     name: '/stats',
     description: 'Stats!',
+    showInHelp: false,
     execute(msg, args) {
         console.log(args);
 

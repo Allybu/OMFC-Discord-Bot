@@ -4,7 +4,8 @@ const games = require('./games');
 
 module.exports = {
     name: '/info',
-    description: 'Info!',
+    description: 'Gibt Infos über das angegebe Spiel aus. /info KÜRZEL',
+    showInHelp: true,
     execute(msg, args) {
         console.log(args);
 
@@ -19,17 +20,18 @@ module.exports = {
                 const title = game ? game.title : args[0];
                 const thumbnail = game
                     ? game.thumb
-                    : 'https://i.imgur.com/YaSVaiE.jpg';
+                    : 'https://i.imgur.com/WWUOKde.jpg';
                 const url = game ? game.link : '';
                 const color = game ? game.color : 0x00ae86;
                 const info = game ? game.info : '...';
+                const image = game ? game.image : null;
 
                 const embed = new Discord.MessageEmbed()
                     .setColor(color)
                     .setTitle(title)
                     .setDescription(info)
                     .setThumbnail(thumbnail)
-                    .setFooter('Info')
+                    .setImage(image)
                     .addField('Code:', args[0], true);
 
                 if (url.length > 0) {

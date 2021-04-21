@@ -27,10 +27,12 @@ function getRandomQuote() {
 }
 
 module.exports = {
-    name: '/marvinsaysomething',
-    description: 'Marvin!',
+    name: '/marvin',
+    description: 'Lasst hören, was Marvin zu sagen hat.',
+    showInHelp: true,
     execute(msg) {
         const quote = getRandomQuote();
         if (quote) msg.channel.send(quote);
+        msg.delete();
     },
 };

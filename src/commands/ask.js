@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 module.exports = {
     name: '/ask',
     description: 'Ask!',
+    showInHelp: false,
     execute(msg, args) {
         console.log(args);
 
