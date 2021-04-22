@@ -15,7 +15,7 @@ module.exports = {
             description += `\n• ${game.title} \`${code}\``;
         }
 
-        description += `\n\n Mit dem Command \`/help\` kannst du sehen, was man mit dem Gamecode machen kann.`
+        description += `\n\n Mit dem Command \`/help\` kannst du sehen, was man mit dem Gamecode machen kann.`;
 
         const embed = new Discord.MessageEmbed()
             .setTitle('Spieleliste')

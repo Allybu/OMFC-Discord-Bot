@@ -124,7 +124,8 @@ async function createTeams(message, max, remove, callback) {
 
 module.exports = {
     name: '/team',
-    description: 'Mit diesem Befehl kann man den Spielern im aktuallen Voice chat in random-teams einteilen. /team random (X)',
+    description:
+        'Mit diesem Befehl kann man den Spielern im aktuallen Voice chat in random-teams einteilen. /team random (X)',
     showInHelp: true,
     execute(msg, args) {
         console.log(args);

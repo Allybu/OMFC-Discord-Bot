@@ -363,7 +363,6 @@ const editInvites = async (client, id, message) => {
     await msgToEdit.edit(message).catch((e) => {
         console.error('Cant edit message', e);
     });
-
 };
 
 const sendInviteLog = async (options) => {

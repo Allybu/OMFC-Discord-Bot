@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const Discord = require('discord.js');
 const axios = require('axios');
 const Querystring = require('querystring');
@@ -7,13 +8,14 @@ const apiKey = process.env.RAWG_API_KEY;
 const rawgUrl = 'https://api.rawg.io/api';
 
 const getRequest = async (path, data) => {
-    if (!data) {
-        data = {}
-    }
-    data.key = apiKey;
-    const queryString = Querystring.stringify(data);
-    return axios.get(`${rawgUrl}/${path}?${queryString}`).then(returnData => returnData.data).catch(error => error);
-}
+    const requestData = data || {};
+    requestData.key = apiKey;
+    const queryString = Querystring.stringify(requestData);
+    return axios
+        .get(`${rawgUrl}/${path}?${queryString}`)
+        .then((returnData) => returnData.data)
+        .catch((error) => error);
+};
 
 module.exports = {
     name: '/game',
@@ -27,14 +29,9 @@ module.exports = {
 
             const id = args[0];
 
-            const data = Querystring.stringify({
-                key: apiKey
-            });
-            
             const answer = await getRequest(`games/${id}`);
 
             console.log(answer);
-
 
             // if (game) {
             //     console.log(game);

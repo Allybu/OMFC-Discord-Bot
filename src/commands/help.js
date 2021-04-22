@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const botCommands = require('../commands');
 
 module.exports = {
     name: '/help',
@@ -7,15 +8,13 @@ module.exports = {
     execute(msg, args) {
         console.log(args);
 
-        const botCommands = require('../commands');
-
         let description = '';
-        for (const [key, value] of Object.entries(botCommands)) {
-            console.log(key, value);
-            if (value.showInHelp) {
-                description += `\n• \`${value.name}\`: ${value.description}`;
+        Object.keys(botCommands).forEach((key) => {
+            console.log(key, botCommands[key]);
+            if (botCommands[key].showInHelp) {
+                description += `\n• \`${botCommands[key].name}\`: ${botCommands[key].description}`;
             }
-        }
+        });
 
         const embed = new Discord.MessageEmbed()
             .setTitle('Eine Liste aller nützlichen Befehle')

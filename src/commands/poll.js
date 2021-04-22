@@ -6,7 +6,8 @@ const printUrls = false;
 
 module.exports = {
     name: '/play',
-    description: 'Startet ein Voting für das angegebene Spiel mit optionalem text. /play KÜRZEL (text)',
+    description:
+        'Startet ein Voting für das angegebene Spiel mit optionalem text. /play KÜRZEL (text)',
     showInHelp: true,
     execute(msg, args) {
         console.log(args);

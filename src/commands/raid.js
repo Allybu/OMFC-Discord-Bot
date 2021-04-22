@@ -13,7 +13,6 @@ module.exports = {
         // /raid edit 818820569976930304 22.02.2021 19:00 UPDATE: Castle Nathria HC - Neue ID
 
         // /raid edit 818820669205905448 22.02.2021 19:00 UPDATE: Castle Nathria Mytisch (Selektierte Auswahl. 20 Spieler!)
-        
 
         let editMode = false;
         let id = 0;
