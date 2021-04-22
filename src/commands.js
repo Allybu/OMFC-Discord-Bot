@@ -13,4 +13,5 @@ module.exports = {
     Roster: require('./commands/roster'),
     Ask: require('./commands/ask'),
     Mythic: require('./commands/mythic'),
+    Game: require('./commands/game'),
 };
