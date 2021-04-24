@@ -11,10 +11,56 @@ const getRequest = async (path, data) => {
     const requestData = data || {};
     requestData.key = apiKey;
     const queryString = Querystring.stringify(requestData);
-    return axios
-        .get(`${rawgUrl}/${path}?${queryString}`)
-        .then((returnData) => returnData.data)
-        .catch((error) => error);
+    return (
+        axios
+            .get(`${rawgUrl}/${path}?${queryString}`)
+            // eslint-disable-next-line consistent-return
+            .then((returnData) => {
+                if (returnData.data && returnData.data.results) {
+                    return returnData.data.results;
+                }
+                if (returnData.data) {
+                    return returnData.data;
+                }
+            })
+            .catch((error) => error)
+    );
+};
+
+const getLogColor = (number) => {
+    if (number < 25) {
+        return '<:log0:806849315778723850>'; // grau
+    }
+    if (number < 50) {
+        return '<:log1:806849315289038880>'; // grün
+    }
+    if (number < 75) {
+        return '<:log2:806849315191914508>'; // blau
+    }
+    if (number < 95) {
+        return '<:log3:806849315262824459>'; // lila
+    }
+    if (number < 100) {
+        return '<:log4:806849315821191189>'; // orange
+    }
+    return '<:log4:806849315821191189>'; // orange TODO: gold?
+};
+
+// eslint-disable-next-line consistent-return
+const getNumberEmoji = (id) => {
+    // eslint-disable-next-line default-case
+    switch (id) {
+        case 0:
+            return ':one:';
+        case 1:
+            return ':two:';
+        case 2:
+            return ':three:';
+        case 3:
+            return ':four:';
+        case 4:
+            return ':five:';
+    }
 };
 
 module.exports = {
@@ -25,44 +71,114 @@ module.exports = {
         console.log(args);
 
         if (args.length > 0) {
-            // Game poll
+            if (args[0] === 'search') {
+                const search = args.splice(1, args.length + 1).join(' ');
 
-            const id = args[0];
+                const games = await getRequest(`games`, {
+                    search,
+                    search_precise: true,
+                    search_exact: true,
+                    page: 1,
+                    page_size: 5,
+                });
 
-            const answer = await getRequest(`games/${id}`);
+                console.log(games);
 
-            console.log(answer);
+                if (games && games.length) {
+                    let description = `**${games.length} Entries:**`;
 
-            // if (game) {
-            //     console.log(game);
+                    games.forEach((game, id) => {
+                        description += `\n${getNumberEmoji(id)} ${
+                            game.name
+                        } \`${game.id}\``;
+                    });
 
-            //     const title = game ? game.title : args[0];
-            //     const thumbnail = game
-            //         ? game.thumb
-            //         : 'https://i.imgur.com/WWUOKde.jpg';
-            //     const url = game ? game.link : '';
-            //     const color = game ? game.color : 0x00ae86;
-            //     const info = game ? game.info : '...';
-            //     const image = game ? game.image : null;
+                    const embed = new Discord.MessageEmbed().setTitle(
+                        'Game Search'
+                    );
 
-            //     const embed = new Discord.MessageEmbed()
-            //         .setColor(color)
-            //         .setTitle(title)
-            //         .setDescription(info)
-            //         .setThumbnail(thumbnail)
-            //         .setImage(image)
-            //         .addField('Code:', args[0], true);
+                    if (description.length) {
+                        embed.setDescription(description);
+                    }
 
-            //     if (url.length > 0) {
-            //         embed.addField('Link:', url, true);
-            //     }
+                    msg.channel.send(['Info:', embed]);
+                }
+            } else {
+                const id = args[0];
 
-            //     msg.channel.send(['Info:', embed]);
-            // } else {
-            //     msg.channel.send(
-            //         'Dieses Spiel existiert nicht in der Datenbank. Benutzt den Befehl **/list**, um eine Liste aller Spiele zu sehen.'
-            //     );
-            // }
+                const gameData = await getRequest(`games/${id}`);
+
+                if (gameData) {
+                    console.log(gameData);
+
+                    const embed = new Discord.MessageEmbed();
+                    if (gameData.name) {
+                        embed.setTitle(gameData.name);
+                    }
+                    if (gameData.background_image) {
+                        embed.setThumbnail(gameData.background_image);
+                    }
+                    if (gameData.dominant_color) {
+                        embed.setColor(gameData.dominant_color);
+                    }
+                    // if (gameData.publishers[0]) {
+                    //     const pubName = gameData.publishers[0].name;
+                    //     // const pubImage = gameData.publishers[0].image_background;
+                    //     embed.setFooter(pubName);
+                    // }
+                    if (gameData.released) {
+                        embed.setTimestamp(gameData.released);
+                    }
+                    if (gameData.website) {
+                        embed.setURL(gameData.website);
+                    }
+                    if (gameData.id) {
+                        embed.setFooter(`ID: ${gameData.id}`);
+                    }
+                    if (
+                        gameData.alternative_names &&
+                        gameData.alternative_names.length
+                    ) {
+                        embed.addField(
+                            'Alt',
+                            gameData.alternative_names.join(', '),
+                            true
+                        );
+                    }
+                    if (gameData.metacritic) {
+                        embed.addField(
+                            'Metascore',
+                            `${getLogColor(gameData.metacritic)} ${
+                                gameData.metacritic
+                            }`,
+                            true
+                        );
+                    }
+                    if (gameData.genres && gameData.genres.length) {
+                        const genName = gameData.genres[0].name;
+                        // const genImage = gameData.genres[0].image_background;
+                        embed.addField('Genre', genName, true);
+                    }
+
+                    // Description
+                    let description = '';
+                    if (gameData.description_raw) {
+                        description = `${
+                            gameData.description_raw.split('.')[0]
+                        }.${gameData.description_raw.split('.')[1]}.`;
+                    }
+
+                    if (description.length) {
+                        embed.setDescription(description);
+                    }
+
+                    msg.channel.send(['Info:', embed]);
+                } else {
+                    msg.channel.send(
+                        'Dieses Spiel existiert nicht in der Datenbank. Benutzt den Befehl **/list**, um eine Liste aller Spiele zu sehen.'
+                    );
+                }
+            }
 
             // msg.delete({ timeout: 10000 });
         } else {

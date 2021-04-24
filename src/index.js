@@ -2,6 +2,7 @@ require('dotenv').config();
 const cron = require('node-cron');
 
 const Discord = require('discord.js');
+const { listenForCommands } = require('./slashCommands');
 const {
     setNewRoster,
     listenForInviteReactions,
@@ -9,9 +10,7 @@ const {
 } = require('./jobs');
 
 // Discord Bot Setup
-const bot = new Discord.Client({
-    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-});
+const bot = new Discord.Client();
 bot.commands = new Discord.Collection();
 const botCommands = require('./commands');
 
@@ -38,6 +37,7 @@ bot.on('ready', () => {
         bot.user.setActivity('Diablo IV');
     }
     listenForInviteReactions(bot);
+    listenForCommands(bot);
 });
 
 bot.on('message', (msg) => {
