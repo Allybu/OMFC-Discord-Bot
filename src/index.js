@@ -2,6 +2,7 @@ require('dotenv').config();
 const cron = require('node-cron');
 
 const Discord = require('discord.js');
+
 const { listenForCommands } = require('./slashCommands');
 const {
     setNewRoster,
