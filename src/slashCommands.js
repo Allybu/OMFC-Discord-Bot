@@ -1,11 +1,11 @@
 /* eslint-disable global-require */
-
 const interactions = require('discord-slash-commands-client');
 
 const guildCommands = true;
 
 const commands = {
-    game: require('./slashCommands/game'),
+    game: require('./slashCommands/game-command'),
+    lan: require('./slashCommands/lan-command'),
 };
 
 const listenForCommands = async (client) => {
