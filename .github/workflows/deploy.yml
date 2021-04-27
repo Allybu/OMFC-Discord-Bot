@@ -52,6 +52,7 @@ jobs:
           export GUILD_ID=${{ secrets.GUILD_ID }}
           export WL_PASSWORD=${{ secrets.WL_PASSWORD }}
           export WL_USERNAME=${{ secrets.WL_USERNAME }}
+          export RAWG_API_KEY=${{ secrets.RAWG_API_KEY }}
           forever start src/index.js
         EOF
 

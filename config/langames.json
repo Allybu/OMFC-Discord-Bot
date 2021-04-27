@@ -5,5 +5,16 @@
         "color": "#f69f25",
         "price": "Free"
     },
-    "20511": {}
+    "20511": {
+        "link": "steam://store/11020",
+        "info": "Crazy Rennen fahren und Rekorde brechen.",
+        "color": "#088a3f",
+        "price": "Free"
+    },
+    "11859": {
+        "link": "steam://store/440",
+        "info": "WaterCube Fun Team Deathmatch.",
+        "color": "#ab6c19",
+        "price": "Free"
+    }
 }

@@ -4,7 +4,6 @@ const Discord = require('discord.js');
 const axios = require('axios');
 const Querystring = require('querystring');
 
-const appId = process.env.APP_ID;
 // const discordUrl = ' https://discord.com';
 const lanGames = require('../../config/langames.json');
 // const { lang } = require('moment');
@@ -45,6 +44,16 @@ const loading = (client, interaction, ephemeral) => {
         });
 };
 
+const getMsgObject = async (client, msg) => {
+    const channel = client.channels.cache.find((c) => c.id === msg.channel_id);
+
+    await channel.messages.fetch();
+
+    return channel.messages.cache.find((message) => {
+        return message.id === msg.id;
+    });
+};
+
 const editInteraction = async (client, interaction, response, ephemeral) => {
     const data =
         typeof response === 'object'
@@ -55,38 +64,47 @@ const editInteraction = async (client, interaction, response, ephemeral) => {
         data.flags = 1 << 6;
         data.embed = response;
     }
-    // data.content = 'ok';
-
-    return client.api
+    const msg = await client.api
         .webhooks(client.user.id, interaction.token)
         .messages('@original')
         .patch({ data })
         .catch((e) => {
             console.error(e);
         });
+
+    const message = await getMsgObject(client, msg);
+    console.log(message);
+    return message;
 };
 
-const followUpMessage = async (client, interaction, response) => {
+const followUpMessage = async (client, interaction, response, ephemeral) => {
     const data =
         typeof response === 'object'
             ? { embeds: [response] }
             : { content: response };
-    const channel = await client.channels.resolve(interaction.channel_id);
-    return axios
-        .post(
-            `https://discord.com/api/v8/webhooks/${appId}/${interaction.token}`,
-            data
-        )
-        .then((returnData) => channel.messages.fetch(returnData.data.id));
+    if (ephemeral) {
+        // eslint-disable-next-line no-bitwise
+        data.flags = 1 << 6;
+        data.embed = response;
+    }
+    const msg = await client.api
+        .webhooks(client.user.id, interaction.token)
+        .post({ data })
+        .catch((e) => {
+            console.error(e);
+        });
+    const message = await getMsgObject(client, msg);
+    return message;
 };
 
 const deleteMessage = async (client, interaction) => {
-    const channel = await client.channels.resolve(interaction.channel_id);
-    return axios
-        .delete(
-            `https://discord.com/api/v8/webhooks/${appId}/${interaction.token}/messages/@original`
-        )
-        .then((returnData) => channel.messages.fetch(returnData.data.id));
+    return client.api
+        .webhooks(client.user.id, interaction.token)
+        .messages('@original')
+        .delete()
+        .catch((e) => {
+            console.error(e);
+        });
 };
 
 const replyInteraction = async (client, interaction, response) => {
@@ -175,6 +193,16 @@ const getLogColor = (number) => {
     return '<:log4:806849315821191189>'; // orange TODO: gold?
 };
 
+const getStatusColor = (status) => {
+    if (status === 'online' || status === 'dnd') {
+        return '<:log1:806849315289038880>'; // grün
+    }
+    if (status === 'idle') {
+        return '<:log4:806849315821191189>'; // orange
+    }
+    return '<:log0:806849315778723850>'; // grau
+};
+
 const getNumberEmoji = (id, emoji) => {
     switch (id) {
         case 0:
@@ -209,7 +237,7 @@ const getEmojiNumber = (emoji) => {
     }
 };
 
-const getGameEmbedById = async (gameId) => {
+const getGameEmbedById = async (gameId, identifier) => {
     const gameData = await getGameRequest(`games/${gameId}`);
 
     if (gameData) {
@@ -218,6 +246,10 @@ const getGameEmbedById = async (gameId) => {
         const lanData = lanGames[gameId];
 
         const embed = new Discord.MessageEmbed();
+
+        if (identifier) {
+            embed.setFooter(identifier);
+        }
         if (gameData.name) {
             embed.setTitle(gameData.name);
         }
@@ -225,14 +257,11 @@ const getGameEmbedById = async (gameId) => {
             embed.setImage(gameData.background_image);
         }
 
-        if (lanData.color || gameData.dominant_color) {
-            embed.setColor(lanData.color || gameData.dominant_color);
+        if (lanData && lanData.color) {
+            embed.setColor(lanData.color);
+        } else if (gameData.dominant_color) {
+            embed.setColor(gameData.dominant_color);
         }
-        // if (gameData.publishers[0]) {
-        //     const pubName = gameData.publishers[0].name;
-        //     // const pubImage = gameData.publishers[0].image_background;
-        //     embed.setFooter(pubName);
-        // }
         if (gameData.released) {
             embed.setTimestamp(gameData.released);
         }
@@ -240,11 +269,9 @@ const getGameEmbedById = async (gameId) => {
             embed.setURL(gameData.website);
         }
         if (gameData.id) {
-            embed.setFooter(`ID: ${gameData.id}`);
+            embed.addField('Id', gameData.id, true);
         }
-        if (gameData.alternative_names && gameData.alternative_names.length) {
-            embed.addField('Alt', gameData.alternative_names.join(', '), true);
-        }
+
         if (gameData.metacritic) {
             embed.addField(
                 'Metascore',
@@ -257,6 +284,29 @@ const getGameEmbedById = async (gameId) => {
             // const genImage = gameData.genres[0].image_background;
             embed.addField('Genre', genName, true);
         }
+        if (gameData.publishers && gameData.publishers.length) {
+            embed.addField(
+                'Publisher',
+                gameData.publishers.map((p) => p.name).join('\n'),
+                true
+            );
+        }
+        if (gameData.developers && gameData.developers.length) {
+            embed.addField(
+                'Developer',
+                gameData.developers.map((p) => p.name).join('\n'),
+                true
+            );
+        }
+        if (gameData.stores && gameData.stores.length) {
+            embed.addField(
+                'Stores',
+                gameData.stores
+                    .map((p) => `[${p.store.name}](https://${p.store.domain})`)
+                    .join('\n'),
+                true
+            );
+        }
 
         // Description
         let description = '';
@@ -264,6 +314,9 @@ const getGameEmbedById = async (gameId) => {
             description = `${gameData.description_raw.split('.')[0]}.${
                 gameData.description_raw.split('.')[1]
             }.`;
+            if (description.length > 200) {
+                description = `${description.substr(0, 200)}...`;
+            }
         }
 
         if (description.length) {
@@ -275,12 +328,12 @@ const getGameEmbedById = async (gameId) => {
     return null;
 };
 
-const getGameEmbedsByIds = async (idList) => {
+const getGameEmbedsByIds = async (idList, identifier) => {
     return Promise.all(
         idList.map(
             (gameId) =>
                 new Promise(async (res) => {
-                    res(getGameEmbedById(gameId));
+                    res(getGameEmbedById(gameId, identifier));
                 })
         )
     );
@@ -301,4 +354,5 @@ module.exports = {
     getEmojiNumber,
     getGameEmbedById,
     getGameEmbedsByIds,
+    getStatusColor,
 };

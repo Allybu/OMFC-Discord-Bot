@@ -12,7 +12,6 @@ const {
     getMultipleGameData,
     getGameRequest,
     getNumberEmoji,
-    getEmojiNumber,
     getGameEmbedById,
     getGameEmbedsByIds,
 } = require('./_utils');
@@ -77,11 +76,11 @@ module.exports = {
         const subCommand = options[0].name;
         const subCommandOptions = options[0].options;
 
-        await loading(client, interaction);
-
         const channel = await getChannel(client, interaction);
 
         if (subCommand === 'search') {
+            await loading(client, interaction, true);
+
             const search = subCommandOptions[0].value;
 
             const games = await getGameRequest(`games`, {
@@ -103,34 +102,33 @@ module.exports = {
                     }\``;
                 });
 
-                const embed = new Discord.MessageEmbed().setTitle(
-                    'Game Search'
-                );
-
-                if (description.length) {
-                    embed.setDescription(description);
-                }
-
                 // return replyInteraction(interaction, embed);
 
-                const msg = await editInteraction(client, interaction, embed);
-
-                games.forEach((game, id) => {
-                    msg.react(getNumberEmoji(id, true));
-                });
-
-                const collector = msg.createReactionCollector(
-                    (r, u) => !u.bot,
-                    { time: 60000 }
+                const msg = await editInteraction(
+                    client,
+                    interaction,
+                    description,
+                    true
                 );
-                collector.on('collect', async (r) => {
-                    const id = getEmojiNumber(r.emoji.name);
-                    if (id) {
-                        const newEmbed = await getGameEmbedById(games[id].id);
-                        msg.edit(newEmbed);
-                        // TODO: Remove reactions!
-                    }
-                });
+
+                console.log(msg);
+
+                // games.forEach((game, id) => {
+                //     msg.react(getNumberEmoji(id, true));
+                // });
+
+                // const collector = msg.createReactionCollector(
+                //     (r, u) => !u.bot,
+                //     { time: 60000 }
+                // );
+                // collector.on('collect', async (r) => {
+                //     const id = getEmojiNumber(r.emoji.name);
+                //     if (id) {
+                //         const newEmbed = await getGameEmbedById(games[id].id);
+                //         msg.edit(newEmbed);
+                //         // TODO: Remove reactions!
+                //     }
+                // });
 
                 // try {
                 //     const test = await reply(client, interaction, embed, true);
@@ -140,10 +138,12 @@ module.exports = {
                 // }
             }
         } else if (subCommand === 'print') {
+            await loading(client, interaction);
             const gameId = subCommandOptions[0].value;
             const embed = await getGameEmbedById(gameId);
             return editInteraction(client, interaction, embed);
         } else if (subCommand === 'list') {
+            await loading(client, interaction);
             const detailed =
                 subCommandOptions && subCommandOptions.length
                     ? subCommandOptions[0].value || false

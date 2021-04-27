@@ -8,6 +8,111 @@ const commands = {
     lan: require('./slashCommands/lan-command'),
 };
 
+const sendReaction = async (client, reaction, user, action) => {
+    if (
+        !user.bot &&
+        reaction.message &&
+        reaction.message.embeds &&
+        reaction.message.embeds[0] &&
+        reaction.message.embeds[0].footer &&
+        reaction.message.embeds[0].footer.text
+    ) {
+        const identifierRaw = reaction.message.embeds[0].footer.text;
+        let identifier = null;
+        let key = null;
+        if (identifierRaw.includes(':')) {
+            const idenfifierParts = identifierRaw.split(':');
+            [identifier, key] = idenfifierParts;
+        } else {
+            identifier = identifierRaw;
+        }
+        if (
+            identifier &&
+            commands[identifier] &&
+            commands[identifier].reaction
+        ) {
+            const guildMemberSender = await reaction.message.guild.members.cache.find(
+                (member) => {
+                    return member.user.id === user.id;
+                }
+            );
+
+            const promises = [];
+            reaction.message.reactions.cache.each((r) => {
+                promises.push(
+                    new Promise((resolve) => {
+                        r.users.fetch().then((a) => {
+                            resolve(a);
+                        });
+                    })
+                );
+            });
+
+            const delimiter = '--------------------------------';
+            let rosterString = '';
+            const stats = [];
+            let count = 0;
+            await Promise.all(promises);
+            reaction.message.reactions.cache.each((r) => {
+                const emojiPrint = `<:${r.emoji.identifier}>`;
+                if (emojiPrint) {
+                    const stat = { emoji: emojiPrint, count: 0 };
+                    r.users.cache
+                        .filter((u) => !u.bot)
+                        .each((u) => {
+                            const guildMember = reaction.message.guild.members.cache.find(
+                                (member) => {
+                                    return member.user.id === u.id;
+                                }
+                            );
+                            if (guildMember.nickname) {
+                                rosterString += `${emojiPrint} ${guildMember.nickname}\n`;
+                                count += 1;
+                                stat.count += 1;
+                            }
+                        });
+                    stats.push(stat);
+                }
+            });
+            let result = '';
+            if (rosterString.length === 0) {
+                rosterString = '*Leer*\n';
+            } else {
+                stats.forEach((s) => {
+                    result += `${s.count} ${s.emoji} `;
+                });
+                result += `(${count})`;
+            }
+
+            const roster = {
+                delimiter,
+                rosterString,
+                result,
+            };
+
+            // const newContent = `${firstLines}\n${delimiter}\n${rosterString}${delimiter}\n${result}\n${delimiter}`;
+
+            return commands[identifier].reaction({
+                client,
+                reaction,
+                key,
+                user,
+                guildMemberSender,
+                action,
+                roster,
+            });
+        }
+    }
+    return null;
+};
+
+const fetchMessages = async (client, channelName) => {
+    const channel = client.channels.cache.find((c) =>
+        c.name.includes(channelName)
+    );
+    return channel.messages.fetch();
+};
+
 const listenForCommands = async (client) => {
     const interactionClient = new interactions.Client(
         process.env.DISCORD_TOKEN,
@@ -32,6 +137,13 @@ const listenForCommands = async (client) => {
     // Create / update all slash commands
     Object.keys(commands).forEach((commandKey) => {
         const command = commands[commandKey];
+
+        if (command.channelNames) {
+            command.channelNames.forEach((channelName) =>
+                fetchMessages(client, channelName)
+            );
+        }
+
         interactionClient
             .createCommand(
                 command.config,
@@ -81,6 +193,13 @@ const listenForCommands = async (client) => {
         //             },
         //         });
         // }
+    });
+
+    client.on('messageReactionAdd', async (reaction, user) => {
+        sendReaction(client, reaction, user, true);
+    });
+    client.on('messageReactionRemove', async (reaction, user) => {
+        sendReaction(client, reaction, user, false);
     });
 };
 
