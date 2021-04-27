@@ -16,5 +16,51 @@
         "info": "WaterCube Fun Team Deathmatch.",
         "color": "#ab6c19",
         "price": "Free"
+    },
+    "35703": {
+        "color": "#205b9c"
+    },
+    "22510": {
+        "color": "#96dbf4"
+    },
+    "10213": {
+        "color": "#d44628"
+    },
+    "10396": {
+        "color": "#b3f3fc"
+    },
+    "528417": {
+        "color": "#245195"
+    },
+    "4527": {
+        "color": "#9cee86"
+    },
+    "12020": {
+        "color": "#7aa60f"
+    },
+    "9966": {
+        "color": "#ffffff"
+    },
+    "9904": {
+        "color": "#fe201c"
+    },
+    "13833": {
+        "color": "#b9a094"
+    },
+    "22509": {
+        "color": "#5fa036"
+    },
+    "388315": {
+        "color": "#4c5d6f"
+    },
+    "290290": {
+        "color": "#1e22ec"
+    },
+    "3272": {
+        "color": "#f6891f",
+        "price": "Free"
+    },
+    "313843": {
+        "color": "#cdc4a7"
     }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable no-async-promise-executor */
-// const Discord = require('discord.js');
+const Discord = require('discord.js');
 require('dotenv').config();
 const rs = require('rocket-store');
 
@@ -39,7 +39,7 @@ const getIdentifier = (key) => `${name}:${key}`;
 
 module.exports = {
     identifier: name,
-    channelNames: ['überblick'],
+    channelNames: ['überblick', 'games'],
     config: {
         name,
         description: 'Alles rund um LAN Party',
@@ -59,6 +59,18 @@ module.exports = {
                 type: 1,
                 name: 'listmembers',
                 description: 'Listet alle auf, die sich angemeldet haben.',
+            },
+            {
+                type: 2,
+                name: 'admin',
+                description: 'Admin commands',
+                options: [
+                    {
+                        type: 1,
+                        name: 'printinvitebox',
+                        description: 'Invite Box',
+                    },
+                ],
             },
             {
                 type: 1,
@@ -91,8 +103,18 @@ module.exports = {
     },
     showInHelp: false,
     async reaction(data) {
-        const fieldName = 'Im Besitz von:';
         if (data.key === 'game') {
+            const fieldName = 'Im Besitz von:';
+            const embed = data.reaction.message.embeds[0];
+            const field = embed.fields.find((f) => f.name === fieldName);
+            if (field) {
+                field.value = data.roster.rosterString;
+            } else {
+                embed.addField(fieldName, data.roster.rosterString);
+            }
+            data.reaction.message.edit(embed);
+        } else if (data.key === 'invite') {
+            const fieldName = 'Liste:';
             const embed = data.reaction.message.embeds[0];
             const field = embed.fields.find((f) => f.name === fieldName);
             if (field) {
@@ -201,6 +223,21 @@ module.exports = {
             });
 
             return editInteraction(client, interaction, description, true);
+        } else if (subCommand === 'admin') {
+            console.log('ok');
+            if (subCommandOptions[0].name === 'printinvitebox') {
+                await loading(client, interaction);
+                await deleteMessage(client, interaction);
+                const embed = new Discord.MessageEmbed()
+                    .setTitle('Anmeldung')
+                    .setDescription(
+                        'Melde dich hier an, indem du mit <:_Check:778760038109544448> reagierst.'
+                    )
+                    .setFooter(getIdentifier('invite'));
+                channel.send(embed).then((messageReaction) => {
+                    messageReaction.react('<:_Check:778760038109544448> ');
+                });
+            }
         }
     },
 };

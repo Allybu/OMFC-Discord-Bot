@@ -53,8 +53,15 @@ const sendReaction = async (client, reaction, user, action) => {
             const stats = [];
             let count = 0;
             await Promise.all(promises);
+            const users = {};
             reaction.message.reactions.cache.each((r) => {
-                const emojiPrint = `<:${r.emoji.identifier}>`;
+                const emojiPrint =
+                    // eslint-disable-next-line no-nested-ternary
+                    r.emoji.guild && !r.emoji.animated
+                        ? `<:${r.emoji.identifier}>`
+                        : !r.emoji.animated
+                        ? r.emoji.name
+                        : '😀';
                 if (emojiPrint) {
                     const stat = { emoji: emojiPrint, count: 0 };
                     r.users.cache
@@ -65,7 +72,8 @@ const sendReaction = async (client, reaction, user, action) => {
                                     return member.user.id === u.id;
                                 }
                             );
-                            if (guildMember.nickname) {
+                            if (guildMember.nickname && !users[u.id]) {
+                                users[u.id] = true;
                                 rosterString += `${emojiPrint} ${guildMember.nickname}\n`;
                                 count += 1;
                                 stat.count += 1;
