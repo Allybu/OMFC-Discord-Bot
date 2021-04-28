@@ -256,12 +256,13 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                     .setTitle('Anmeldung')
                     .setDescription(
-                        'Melde dich hier an, indem du mit <:_Check:778760038109544448> reagierst.'
+                        'Melde dich hier an, indem du auf diese Nachricht mit einer OMFC- oder Standard-Emoji-Reaktion deiner Wahl reagierst.'
                     )
                     .setFooter(getIdentifier('invite'));
-                channel.send(embed).then((messageReaction) => {
-                    messageReaction.react('<:_Check:778760038109544448> ');
-                });
+                channel.send(embed);
+                // channel.send(embed).then((messageReaction) => {
+                //     messageReaction.react('<:_Check:778760038109544448> ');
+                // });
             }
         } else if (subCommand === 'server') {
             if (subCommandOptions[0].name === 'printinvitebox') {
