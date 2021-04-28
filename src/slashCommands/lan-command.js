@@ -231,7 +231,7 @@ module.exports = {
                 const embed = new Discord.MessageEmbed()
                     .setTitle('Anmeldung')
                     .setDescription(
-                        'Melde dich hier an, indem du auf diese Nachricht mit einer Reaktion deiner Wahl reagierst.'
+                        'Melde dich hier an, indem du auf diese Nachricht mit einer OMFC- oder Standard-Emoji-Reaktion deiner Wahl reagierst.'
                     )
                     .setFooter(getIdentifier('invite'));
                 channel.send(embed);
