@@ -45,20 +45,46 @@ module.exports = {
         description: 'Alles rund um LAN Party',
         default_permission: true,
         options: [
+            // {
+            //     type: 1,
+            //     name: 'join',
+            //     description: 'Mach mit :D',
+            // },
+            // {
+            //     type: 1,
+            //     name: 'leave',
+            //     description: 'Tschüss :(',
+            // },
+            // {
+            //     type: 1,
+            //     name: 'listmembers',
+            //     description: 'Listet alle auf, die sich angemeldet haben.',
+            // },
             {
                 type: 1,
-                name: 'join',
-                description: 'Mach mit :D',
-            },
-            {
-                type: 1,
-                name: 'leave',
-                description: 'Tschüss :(',
-            },
-            {
-                type: 1,
-                name: 'listmembers',
-                description: 'Listet alle auf, die sich angemeldet haben.',
+                name: 'server',
+                description:
+                    'Erstelle eine Karte für einen Server, damit andere leichter joinen können.',
+                options: [
+                    {
+                        type: 4,
+                        name: 'id',
+                        description: 'Id des Spiels',
+                        required: true,
+                    },
+                    {
+                        type: 3,
+                        name: 'ip',
+                        description: 'Server IP Adresse',
+                        required: true,
+                    },
+                    {
+                        type: 3,
+                        name: 'description',
+                        description: 'Beschreibung (optional)',
+                        required: false,
+                    },
+                ],
             },
             {
                 type: 2,
@@ -75,7 +101,7 @@ module.exports = {
             {
                 type: 1,
                 name: 'printgame',
-                description: 'Gibt eine Karte eines Spiels aus.',
+                description: 'Gibt eine Karte mit Infos über das Spiel aus.',
                 options: [
                     {
                         type: 4,
@@ -224,7 +250,6 @@ module.exports = {
 
             return editInteraction(client, interaction, description, true);
         } else if (subCommand === 'admin') {
-            console.log('ok');
             if (subCommandOptions[0].name === 'printinvitebox') {
                 await loading(client, interaction);
                 await deleteMessage(client, interaction);
@@ -237,6 +262,18 @@ module.exports = {
                 channel.send(embed).then((messageReaction) => {
                     messageReaction.react('<:_Check:778760038109544448> ');
                 });
+            }
+        } else if (subCommand === 'server') {
+            if (subCommandOptions[0].name === 'printinvitebox') {
+                await loading(client, interaction);
+                const embed = new Discord.MessageEmbed()
+                    .setTitle('Anmeldung')
+                    .setDescription(
+                        'Melde dich hier an, indem du mit <:_Check:778760038109544448> reagierst.'
+                    )
+                    .setFooter(getIdentifier('invite'));
+
+                channel.send(embed);
             }
         }
     },
