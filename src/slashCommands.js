@@ -148,7 +148,12 @@ const listenForCommands = async (client) => {
 
         if (command.channelNames) {
             command.channelNames.forEach((channelName) =>
-                fetchMessages(client, channelName)
+                fetchMessages(client, channelName).catch((e) => {
+                    console.error(
+                        `Error fetching messages for channel ${channelName}`,
+                        e
+                    );
+                })
             );
         }
 
