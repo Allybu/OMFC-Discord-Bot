@@ -211,7 +211,12 @@ module.exports = {
                         return 0;
                     })
                     .forEach((gameData) => {
+                        const lanData = lanGames[gameData.id];
                         description += `\n• ${gameData.name} \`${gameData.id}\``;
+
+                        if (lanData.price && lanData.price === 'Free') {
+                            description += ` <:freetoplay:837369116964421692>`;
+                        }
                     });
 
                 return editInteraction(client, interaction, description, true);

@@ -18,19 +18,24 @@
         "price": "Free"
     },
     "35703": {
-        "color": "#205b9c"
+        "color": "#205b9c",
+        "price": "Free"
     },
     "22510": {
-        "color": "#96dbf4"
+        "color": "#96dbf4",
+        "price": "Free"
     },
     "10213": {
-        "color": "#d44628"
+        "color": "#d44628",
+        "price": "Free"
     },
     "10396": {
-        "color": "#b3f3fc"
+        "color": "#b3f3fc",
+        "price": "Free"
     },
     "528417": {
-        "color": "#245195"
+        "color": "#245195",
+        "price": "Free"
     },
     "4527": {
         "color": "#9cee86"
@@ -54,7 +59,8 @@
         "color": "#4c5d6f"
     },
     "290290": {
-        "color": "#1e22ec"
+        "color": "#1e22ec",
+        "price": "Free"
     },
     "3272": {
         "color": "#f6891f",
@@ -63,10 +69,18 @@
     "313843": {
         "color": "#cdc4a7"
     },
-    "42044": {},
-    "593235": {},
-    "290856": {},
+    "42044": {
+        "price": "Free"
+    },
+    "593235": {
+        "price": "Free"
+    },
+    "290856": {
+        "price": "Free"
+    },
     "19301": {},
     "34744": {},
-    "752": {}
+    "752": {
+        "price": "Free"
+    }
 }
