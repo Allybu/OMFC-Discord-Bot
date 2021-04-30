@@ -39,7 +39,7 @@ const getIdentifier = (key) => `${name}:${key}`;
 
 module.exports = {
     identifier: name,
-    channelNames: ['überblick', 'games'],
+    channelNames: ['überblick', 'games', 'turniere'],
     config: {
         name,
         description: 'Alles rund um LAN Party',
@@ -111,6 +111,20 @@ module.exports = {
                             },
                         ],
                     },
+                    {
+                        type: 1,
+                        name: 'printtournament',
+                        description: 'Tournament Box',
+                        required: false,
+                        options: [
+                            {
+                                type: 3,
+                                name: 'id',
+                                description: 'Game ID',
+                                required: true,
+                            },
+                        ],
+                    },
                 ],
             },
             // {
@@ -156,6 +170,16 @@ module.exports = {
             data.reaction.message.edit(embed);
         } else if (data.key === 'invite') {
             const fieldName = 'Liste:';
+            const embed = data.reaction.message.embeds[0];
+            const field = embed.fields.find((f) => f.name === fieldName);
+            if (field) {
+                field.value = data.roster.rosterString;
+            } else {
+                embed.addField(fieldName, data.roster.rosterString);
+            }
+            data.reaction.message.edit(embed);
+        } else if (data.key === 'tournament') {
+            const fieldName = 'Teilnehmer:';
             const embed = data.reaction.message.embeds[0];
             const field = embed.fields.find((f) => f.name === fieldName);
             if (field) {
@@ -282,8 +306,7 @@ module.exports = {
                     )
                     .setFooter(getIdentifier('invite'));
                 channel.send(embed);
-            }
-            if (subCommandOptions[0].name === 'printgame') {
+            } else if (subCommandOptions[0].name === 'printgame') {
                 await loading(client, interaction);
                 const gameId = subCommandOptions[0].options[0].value;
                 const embed = await getGameEmbedById(
@@ -294,6 +317,40 @@ module.exports = {
                 channel.send(embed).then((messageReaction) => {
                     messageReaction.react('<:mine:836270884536057926> ');
                 });
+            } else if (subCommandOptions[0].name === 'printtournament') {
+                await loading(client, interaction);
+                const gameId = subCommandOptions[0].options[0].value;
+
+                const gameData = await getGameRequest(`games/${gameId}`);
+
+                if (gameData) {
+                    const lanData = lanGames[gameId];
+                    const embed = new Discord.MessageEmbed()
+                        .setFooter(getIdentifier('tournament'))
+                        .setDescription(
+                            'Reagiere auf diese Nachricht, um mitzumachen.'
+                        );
+
+                    if (gameData.name) {
+                        embed.setTitle(`${gameData.name} Turnier`);
+                    }
+                    if (gameData.background_image) {
+                        embed.setThumbnail(gameData.background_image);
+                    }
+                    if (lanData && lanData.color) {
+                        embed.setColor(lanData.color);
+                    } else if (gameData.dominant_color) {
+                        embed.setColor(gameData.dominant_color);
+                    }
+                    if (gameData.website) {
+                        embed.setURL(gameData.website);
+                    }
+
+                    await deleteMessage(client, interaction);
+                    channel.send(embed).then((messageReaction) => {
+                        messageReaction.react('<:_Check:778760038109544448>');
+                    });
+                }
             }
         } else if (subCommand === 'server') {
             await loading(client, interaction);
