@@ -4,8 +4,9 @@ const interactions = require('discord-slash-commands-client');
 const guildCommands = true;
 
 const commands = {
-    game: require('./slashCommands/game-command'),
-    lan: require('./slashCommands/lan-command'),
+    // game: require('./slashCommands/game-command'),
+    // lan: require('./slashCommands/lan-command'),
+    wow: require('./slashCommands/wow-command'),
 };
 
 const sendReaction = async (client, reaction, user, action) => {
